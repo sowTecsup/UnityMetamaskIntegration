@@ -17,6 +17,15 @@ using Nethereum.StandardTokenEIP20;
 
 public class SimpleWalletLogin : MonoBehaviour
 {
+    public static SimpleWalletLogin Instance { get; private set; }
+
+    public Nethereum.Web3.Web3 Web3 => web3;
+    public Account Account => account;
+    public string WalletAddress => walletAddress;
+    public bool IsLoggedIn => web3 != null && !string.IsNullOrEmpty(walletAddress);
+
+    public event Action OnWalletStateChanged;
+
     [Header("Web3Auth / MetaMask Embedded Wallets")]
     [SerializeField] private string clientId = "TU_CLIENT_ID";
     [SerializeField] private string redirectScheme = "torusapp://com.torus.Web3AuthUnity/auth";
@@ -65,6 +74,12 @@ public class SimpleWalletLogin : MonoBehaviour
         }
     };
 
+    private void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+    }
+
     private void Start()
     {
         web3Auth = GetComponent<Web3Auth>();
@@ -74,7 +89,7 @@ public class SimpleWalletLogin : MonoBehaviour
             clientId = clientId,
             network = Web3Auth.Network.SAPPHIRE_DEVNET, // para pruebas
             redirectUrl = new Uri(redirectScheme),
-            sessionTime = 86400 // 1 día
+            sessionTime = 86400 // 1 dï¿½a
         });
 
         web3Auth.onLogin += OnLogin;
@@ -119,7 +134,7 @@ public class SimpleWalletLogin : MonoBehaviour
 
             if (string.IsNullOrEmpty(privateKey))
             {
-                statusText.text = "No se recibió private key EVM.";
+                statusText.text = "No se recibiï¿½ private key EVM.";
                 return;
             }
 
@@ -131,6 +146,7 @@ public class SimpleWalletLogin : MonoBehaviour
             addressText.text = walletAddress;
             statusText.text = $"Login correcto en {chainName}";
 
+            OnWalletStateChanged?.Invoke();
             await RefreshBalances();
         }
         catch (Exception ex)
@@ -142,7 +158,8 @@ public class SimpleWalletLogin : MonoBehaviour
     private void OnLogout()
     {
         SetLoggedOutState();
-        statusText.text = "Sesión cerrada";
+        statusText.text = "SesiÃ³n cerrada";
+        OnWalletStateChanged?.Invoke();
     }
 
     private void SetLoggedOutState()
@@ -159,7 +176,7 @@ public class SimpleWalletLogin : MonoBehaviour
     {
         if (web3 == null || string.IsNullOrEmpty(walletAddress))
         {
-            statusText.text = "Primero inicia sesión.";
+            statusText.text = "Primero inicia sesiï¿½n.";
             return;
         }
 
