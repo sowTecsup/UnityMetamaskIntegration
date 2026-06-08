@@ -16,6 +16,7 @@ public class ReceivePanel : MonoBehaviour
     [Header("Sección: solicitar monto fijo (Flujo 2)")]
     [SerializeField] private TMP_InputField amountInput;
     [SerializeField] private Button generateRequestButton;
+    [SerializeField] private Button closeBtn;
     [SerializeField] private RawImage requestQRImage;
     [SerializeField] private TMP_Text requestUriLabel;
 
@@ -27,6 +28,7 @@ public class ReceivePanel : MonoBehaviour
     private void Awake()
     {
         generateRequestButton.onClick.AddListener(GenerateRequestQR);
+        closeBtn.onClick.AddListener(() => panel.SetActive(false));
         panel.SetActive(false);
     }
 

@@ -38,6 +38,12 @@ public class SimpleWalletLogin : MonoBehaviour
     [SerializeField] private Button loginButton;
     [SerializeField] private Button logoutButton;
     [SerializeField] private Button refreshButton;
+    [SerializeField] private Button openSendButton;
+    [SerializeField] private Button openReceiveButton;
+    [SerializeField] private SendPanel sendPanel;
+    [SerializeField] private ReceivePanel receivePanel;
+
+
     [SerializeField] private TMP_Text statusText;
     [SerializeField] private TMP_Text addressText;
     [SerializeField] private Transform tokenListRoot;
@@ -98,6 +104,19 @@ public class SimpleWalletLogin : MonoBehaviour
         loginButton.onClick.AddListener(LoginGoogle);
         logoutButton.onClick.AddListener(Logout);
         refreshButton.onClick.AddListener(() => _ = RefreshBalances());
+
+        if (openSendButton != null)
+            openSendButton.onClick.AddListener(() =>
+            {
+                
+                sendPanel.Show();
+            });
+
+        if (openReceiveButton != null)
+            openReceiveButton.onClick.AddListener(() =>
+            {
+               receivePanel.Show();
+            });
 
         SetLoggedOutState();
     }

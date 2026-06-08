@@ -87,7 +87,7 @@ public class QRScannerUI : MonoBehaviour
 
     private IEnumerator ScanLoop()
     {
-        var reader = new BarcodeReader
+        var reader = new BarcodeReaderGeneric
         {
             AutoRotate = true,
             Options = new ZXing.Common.DecodingOptions
@@ -109,12 +109,24 @@ public class QRScannerUI : MonoBehaviour
         }
     }
 
-    private void TryDecode(BarcodeReader reader)
+    private void TryDecode(BarcodeReaderGeneric reader)
     {
         if (_webCamTexture == null || !_webCamTexture.isPlaying) return;
 
         Color32[] pixels = _webCamTexture.GetPixels32();
-        var result = reader.Decode(pixels, _webCamTexture.width, _webCamTexture.height);
+
+        byte[] rawBytes = new byte[pixels.Length * 4];
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            int offset = i * 4;
+            rawBytes[offset] = pixels[i].r;
+            rawBytes[offset + 1] = pixels[i].g;
+            rawBytes[offset + 2] = pixels[i].b;
+            rawBytes[offset + 3] = pixels[i].a;
+        }
+
+        var result = reader.Decode(rawBytes, _webCamTexture.width, _webCamTexture.height,
+            RGBLuminanceSource.BitmapFormat.RGBA32);
 
         if (result != null && !string.IsNullOrEmpty(result.Text))
         {
